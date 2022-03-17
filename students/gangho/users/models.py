@@ -13,23 +13,27 @@ from django.db import models
 # 연락처(휴대폰)
 
 def validate_email(email):
-    # 이메일 유효성 검사에 뭐가 필요하지?
-    # e.g.) gleehave@gmail.com
+    email_expression = re.compile('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 
-    # 1. id는 특수문자 없어야 함.
-    # 2. @는 꼭 필요함
-    # 3. 뒤에는 aaa@gmail.com -> .com
-    email_expression = re.compile('^[a-zA-Z0-9+-_.]]+@[a-zA-Z]+\.[a-z]]+$')
     if not email_expression.match(email):
         raise ValidationError(
-            ('%(value)s is not an email expression'),
+            '%(value)s is not an email expression',
             params={'email': email},
+        )
+
+def validate_password(password):
+    password_expression = re.compile('[a-zA-Z0-9+-_.]')
+
+    if not password_expression.match(password):
+        raise ValidationError(
+            ('%(value)s is not an password expression'),
+            params={'password': password},
         )
 
 class User(models.Model):
     name        = models.CharField(max_length=45, db_column='name')
     email       = models.EmailField(validators=[validate_email], db_column='email')
-    password    = models.CharField(max_length=30, db_column='password')
+    password    = models.CharField(validators=[validate_password],max_length=30, db_column='password')
     cell_phone  = models.CharField(max_length=30, db_column='cell_phone')
 
     class Meta:
