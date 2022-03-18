@@ -1,32 +1,34 @@
-import re
 import json
 from django.http import JsonResponse
 from django.views import View
 
 from users.models import User
+from users.validators import validate_email, validate_password
 
-def validate_email(email):
-    email_expression = re.match(r'^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email)
-    return email_expression
-
-def validate_password(password):
-    password_expression = re.match(r'/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/', password)
-    return password_expression
 
 class SignupView(View):
     def post(self, request):
-        data = json.load(request.body)
+        data = json.loads(request.body)
 
-        if not (data['email'] and data['passowrd']):
+        if not (data['email'] and data['password']):
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
-        if not validate_email(data['email']):
-            return JsonResponse({'message': 'This is not a valid email expression.'}, status=401)
+        validate_email(data['email'])
+        validate_password(data['password'])
 
-        if not validate_password(data['passowrd']):
-            return JsonResponse({'message': 'This is not a valid password expression.'}, status=401)
+        if data['email']:
+            user_in_database = User.objects.get(email=data['email'])
+            if user_in_database:
+                return JsonResponse({'message': 'You are already a registered user.'}, status=401)
+            else:
+                User.objects.create(
+                    name        = data['name'],
+                    email       = data['email'],
+                    password    = data['password'],
+                    phone_number= data['phone_number'],
+                    created_at  = data['created_at'],
+                    updated_at  = data['updated_at']
+                )
+                return JsonResponse({'message': 'Welcome to our service.'}, status=200)
 
-        return JsonResponse({'message':'network is woring.'}, status=200)
-
-    def get(self, request):
-        return JsonResponse({'message': 'network is woring.'}, status=200)
+        return JsonResponse({'message': 'network is working.'}, status=200)
