@@ -15,11 +15,11 @@ class SignIn(View):
             password                = data['password']
             password_validation     = re.compile("^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+?&]{8,}$")
             phone_number            = data['phone_number']
-            phone_number_validation = re.compile('/^\d{3}-\d{3,4}-\d{4}$/')
+            phone_number_validation = re.compile("^\d{3}-\d{3,4}-\d{4}$")
             address                 = data['address']
             
             if email=="" or password =="":
-                return JsonResponse({"message": "KET_ERROR"}, status=400)
+                return JsonResponse({"message": "KEY_ERROR"}, status=400)
             if not email_validation.match(email):
                 return JsonResponse({"message": "Email을 형식에 맞게 입력하세요"}, status=400)
             if not password_validation.match(password):
@@ -48,19 +48,21 @@ class LogIn(View):
 
         result_email = User.objects.filter(email=email).exists()
         result_password = User.objects.filter(password=password).exists()
-        email_email = User.objects.get(email=email)
-        email_id = email_email.id 
-        password__password = User.objects.get(password=password)
-        password_id = password__password.id
+        a = User.objects.get(email = email)
+        a_password = a.password
+        b = User.objects.get(password = password)
+        b_email = b.email
+
         if email == "" or password == "":
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
         elif result_email == False or result_password == False:
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
-        if email_id == password_id:
+        if a_password == password and b_email == email:
             if result_email == True and result_password == True:
                 return JsonResponse({"message" : "SUCCESS"}, status=200)
         else:
-            return JsonResponse({"message": "email_id != password_id"}, status=401) 
+            return JsonResponse({"message" : "INVALID_PASSWORD"}, status=200)
+
 
 
         
