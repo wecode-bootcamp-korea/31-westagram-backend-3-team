@@ -23,11 +23,11 @@ def validate_password(password):
         )
 
 def validate_cell_phone(cell_phone):
-    cell_phone_expression = re.compile('[]]')
+    cell_phone_expression = re.compile('\d{3}-\d{3,4}-\d{4}')
 
     if not cell_phone_expression.match(cell_phone):
         raise ValidationError(
-            _('%(value)s is not an email expression'),
+            _('%(value)s is not an cell phone expression'),
             params={'email': cell_phone},
         )
 
