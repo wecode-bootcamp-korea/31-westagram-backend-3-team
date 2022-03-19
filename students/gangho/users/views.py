@@ -8,27 +8,37 @@ from users.validators import validate_email, validate_password
 
 class SignupView(View):
     def post(self, request):
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
 
-        if not (data['email'] and data['password']):
-            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
+            if validate_email(data['email']) is None:
+                return JsonResponse({
+                    'message': 'This email is not a valid email expression.'
+                }, status=400)
 
-        validate_email(data['email'])
-        validate_password(data['password'])
+            if validate_password(data['password']) is None:
+                return JsonResponse({
+                    'message': 'This password is not a valid password expression.'
+                }, status=400)
 
-        if data['email']:
-            user_in_database = User.objects.get(email=data['email'])
-            if user_in_database:
-                return JsonResponse({'message': 'You are already a registered user.'}, status=401)
+            if User.objects.filter(email=data['email']).exists():
+                return JsonResponse({
+                    'message': 'This email is already a registered email.'
+                }, status=401)
             else:
                 User.objects.create(
-                    name        = data['name'],
-                    email       = data['email'],
-                    password    = data['password'],
-                    phone_number= data['phone_number'],
-                    created_at  = data['created_at'],
-                    updated_at  = data['updated_at']
+                    name=data['name'],
+                    email=data['email'],
+                    password=data['password'],
+                    phone_number=data['phone_number']
                 )
-                return JsonResponse({'message': 'Welcome to our service.'}, status=200)
+                return JsonResponse({
+                    'message': 'Welcome to our service.'
+                }, status=200)
+
+        except KeyError:
+            return JsonResponse({
+                'message': 'Key Error'
+            }, status=400)
 
         return JsonResponse({'message': 'network is working.'}, status=200)
