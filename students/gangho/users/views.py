@@ -27,10 +27,10 @@ class SignupView(View):
                 }, status=401)
             else:
                 User.objects.create(
-                    name=data['name'],
-                    email=data['email'],
-                    password=data['password'],
-                    phone_number=data['phone_number']
+                    name            =data['name'],
+                    email           =data['email'],
+                    password        =data['password'],
+                    phone_number    =data['phone_number']
                 )
                 return JsonResponse({
                     'message': 'Welcome to our service.'
