@@ -3,6 +3,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views import View
+from django.db import IntegrityError
 
 from users.models import User
 from users.validators import validate_email, validate_password
@@ -44,3 +45,7 @@ class SignupView(View):
             return JsonResponse({
                 'message': 'Invalid Key'
             }, status=400)
+        except IntegrityError:
+            return JsonResponse({
+                'message': 'email overlap.'
+            })
