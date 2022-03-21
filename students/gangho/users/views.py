@@ -49,3 +49,28 @@ class SignupView(View):
             return JsonResponse({
                 'message': 'email overlap.'
             }, status=400)
+
+class SigninView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+
+            email    = data['email']
+            password = data['password']
+
+            validate_email(email)
+            validate_password(password)
+
+            if User.objects.filter(email=data['email'], password=data['password']).exists():
+                return JsonResponse({'message': 'SUCCESS'}, status=200)
+
+            return JsonResponse({'message': 'INVALID_USER'}, status=401)
+
+        except KeyError:
+            return JsonResponse({
+                'message': 'KEY_ERROR'
+            }, status=400)
+        except ValidationError as e:
+            return JsonResponse({
+                'message': e.messages
+            }, status=400)
