@@ -1,4 +1,6 @@
 import json
+
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views import View
 
@@ -11,15 +13,8 @@ class SignupView(View):
         try:
             data = json.loads(request.body)
 
-            if validate_email(data['email']) is None:
-                return JsonResponse({
-                    'message': 'This email is not a valid email expression.'
-                }, status=400)
-
-            if validate_password(data['password']) is None:
-                return JsonResponse({
-                    'message': 'This password is not a valid password expression.'
-                }, status=400)
+            validate_email(data['email'])
+            validate_password(data['password'])
 
             if User.objects.filter(email=data['email']).exists():
                 return JsonResponse({
@@ -40,5 +35,7 @@ class SignupView(View):
             return JsonResponse({
                 'message': 'Key Error'
             }, status=400)
-
-        return JsonResponse({'message': 'network is working.'}, status=200)
+        except ValidationError:
+            return JsonResponse({
+                'message': 'Email or Password is not a valid expression.'
+            }, status=400)
