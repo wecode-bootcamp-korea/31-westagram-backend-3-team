@@ -11,15 +11,15 @@ class SignUpView (View):
         try:
             data= json.loads(request.body)
             
-            name = data["name"]
-            email = data["email"]
-            password = data["password"]
+            name         = data["name"]
+            email        = data["email"]
+            password     = data["password"]
             phone_number = data["phone_number"]
                 
-            if User.objects.filter(email=email).exists() : # 기존 가입한 회원의 이메일과 가입할려는 사람의 이메일이 같을시 에러 반환
+            if User.objects.filter(email=email).exists() : 
                 return JsonResponse({"message" : "ALREADY EXISTS"}, status=400)
             
-            regex_email = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+            regex_email    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
             regex_password = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$"
                 
             if not re.match(regex_email, email) :
@@ -31,9 +31,9 @@ class SignUpView (View):
            
             User.objects.create(
                 
-                name = name,
-                email = email,
-                password = password,
+                name         = name,
+                email        = email,
+                password     = password,
                 phone_number = phone_number,
             )
            
