@@ -48,4 +48,4 @@ class SignupView(View):
         except IntegrityError:
             return JsonResponse({
                 'message': 'email overlap.'
-            })
+            }, status=400)
