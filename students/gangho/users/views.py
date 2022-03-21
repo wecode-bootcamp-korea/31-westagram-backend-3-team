@@ -43,7 +43,7 @@ class SignupView(View):
             }, status=400)
         except ValidationError as e:
             return JsonResponse({
-                'message': str(e)
+                'message': e.messages
             }, status=400)
         except IntegrityError:
             return JsonResponse({
