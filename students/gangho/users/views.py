@@ -12,20 +12,24 @@ class SignupView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
+            name         = data['name']
+            email        = data['email']
+            password     = data['password']
+            phone_number = data['phone_number']
 
-            validate_email(data['email'])
-            validate_password(data['password'])
+            validate_email(email)
+            validate_password(password)
 
-            if User.objects.filter(email=data['email']).exists():
+            if User.objects.filter(email=email).exists():
                 return JsonResponse({
                     'message': 'This email is already a registered email.'
                 }, status=401)
             else:
                 User.objects.create(
-                    name            =data['name'],
-                    email           =data['email'],
-                    password        =data['password'],
-                    phone_number    =data['phone_number']
+                    name            = name,
+                    email           = email,
+                    password        = password,
+                    phone_number    = phone_number
                 )
                 return JsonResponse({
                     'message': 'Welcome to our service.'
@@ -37,5 +41,5 @@ class SignupView(View):
             }, status=400)
         except ValidationError:
             return JsonResponse({
-                'message': 'Email or Password is not a valid expression.'
+                'message': 'Invalid Key'
             }, status=400)
