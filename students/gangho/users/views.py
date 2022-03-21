@@ -24,16 +24,17 @@ class SignupView(View):
                 return JsonResponse({
                     'message': 'This email is already a registered email.'
                 }, status=401)
-            else:
-                User.objects.create(
-                    name            = name,
-                    email           = email,
-                    password        = password,
-                    phone_number    = phone_number
-                )
-                return JsonResponse({
-                    'message': 'Welcome to our service.'
-                }, status=200)
+
+            User.objects.create(
+                name            = name,
+                email           = email,
+                password        = password,
+                phone_number    = phone_number
+            )
+
+            return JsonResponse({
+                'message': 'Welcome to our service.'
+            }, status=200)
 
         except KeyError:
             return JsonResponse({
