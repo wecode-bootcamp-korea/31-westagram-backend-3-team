@@ -1,11 +1,11 @@
 import json
-import re
 import bcrypt
 
 from django.views import View
 from django.http import JsonResponse
 
 from .models import User
+from .validation import email_validation, password_validation, phone_number_validation
 
 class SignUpView(View):
     def post(self, request):
@@ -16,26 +16,19 @@ class SignUpView(View):
             password                = data['password']
             phone_number            = data['phone_number']
             address                 = data['address']
-            encoded_password        = password.encode('utf-8')
-            hash_password           = bcrypt.hashpw(encoded_password, bcrypt.gensalt())
-            decoded_hashed_password = hash_password.decode('utf-8')
-            regex_email             = "^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$"
-            regex_password          = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+?&]{8,}$"
-            regex_phone_number      = "^\d{3}-\d{3,4}-\d{4}$"
+            hash_password           = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            
+            email_validation(email)
+            password_validation(password)
+            phone_number_validation(phone_number)
 
-            if not re.match(regex_email, email):
-                return JsonResponse({"message": "EMAIL_FORM_ERROR"}, status=400)
-            if not re.match(regex_password, password):
-                return JsonResponse({"message": "PASSWORD_FORM_ERROR"}, status=400)
-            if not re.match(regex_phone_number, phone_number):
-                return JsonResponse({"message": "PHONE_NUMBER_FORM_ERROR"}, status=400)
             if User.objects.filter(email=email):
                     return JsonResponse({"message": "EMAIL_ALREADY_EXISTS"}, status=400)
 
             User.objects.create(
                 name         = name,
                 email        = email,
-                password     = decoded_hashed_password,
+                password     = hash_password,
                 phone_number = phone_number,
                 address      = address
             )
