@@ -19,13 +19,13 @@ class SignUpView (View):
             if User.objects.filter(email=email).exists() : 
                 return JsonResponse({"message" : "ALREADY EXISTS"}, status=400)
             
-            regex_email    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-            regex_password = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$"
+            REGEX_EMAIL    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+            REGEX_PASSWORD = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$"
                 
-            if not re.match(regex_email, email) :
+            if not re.match(REGEX_EMAIL, email) :
                 return JsonResponse({"message" : "INVALID EMAIL"}, status=400)
                                     
-            if not re.match(regex_password, password) :
+            if not re.match(REGEX_PASSWORD, password) :
                return JsonResponse({"message" : "INVALID PASSWORD"}, status=400)
            
            
