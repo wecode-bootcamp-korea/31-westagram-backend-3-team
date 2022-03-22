@@ -15,7 +15,6 @@ class SignUpView(View):
             password           = data['password']
             phone_number       = data['phone_number']
             address            = data['address']
-            result             = User.objects.filter(email=email)
             regex_email        = "^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$"
             regex_password     = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+?&]{8,}$"
             regex_phone_number = "^\d{3}-\d{3,4}-\d{4}$"
@@ -28,7 +27,7 @@ class SignUpView(View):
                 return JsonResponse({"message": "PHONE_NUMBER_FORM_ERROR"}, status=400)
             if User.objects.filter(email=email):
                 return JsonResponse({"message": "EMAIL_ALREADY_EXISTS"}, status=400)
-                
+
             User.objects.create(
                 name         = name,
                 email        = email,
