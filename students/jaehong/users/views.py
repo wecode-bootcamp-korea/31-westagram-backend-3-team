@@ -1,4 +1,4 @@
-import json, re
+import json, re, bcrypt
 
 from .models import User
 
@@ -28,14 +28,14 @@ class SignUpView (View):
             if not re.match(REGEX_PASSWORD, password) :
                return JsonResponse({"message" : "INVALID PASSWORD"}, status=400)
            
-           
+            password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
            
            
             User.objects.create(
                 
                 name         = name,
                 email        = email,
-                password     = password,
+                password     = password.decode('utf-8'),
                 phone_number = phone_number,
             )
            
