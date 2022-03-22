@@ -26,17 +26,17 @@ class SignUpView(View):
                 return JsonResponse({"message": "PASSWORD_FORM_ERROR"}, status=400)
             if not re.match(regex_phone_number, phone_number):
                 return JsonResponse({"message": "PHONE_NUMBER_FORM_ERROR"}, status=400)
-
-            if not result:
-                User.objects.create(
-                    name         = name,
-                    email        = email,
-                    password     = password,
-                    phone_number = phone_number,
-                    address      = address
-                    )
-                return JsonResponse({"message" : "SUCCESS"}, status=201)
-            return JsonResponse({"message": "ALREADY_USED_EMAIL"}, status=400)
+            if User.objects.filter(email=email):
+                return JsonResponse({"message": "EMAIL_ALREADY_EXISTS"}, status=400)
+                
+            User.objects.create(
+                name         = name,
+                email        = email,
+                password     = password,
+                phone_number = phone_number,
+                address      = address
+            )
+            return JsonResponse({"message" : "SUCCESS"}, status=201)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
