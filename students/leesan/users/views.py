@@ -3,6 +3,7 @@ import bcrypt
 
 from django.views import View
 from django.http import JsonResponse
+from django.forms import ValidationError
 
 from .models import User
 from .validation import email_validation, password_validation, phone_number_validation
@@ -35,6 +36,8 @@ class SignUpView(View):
             
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
+        except ValidationError:
+            return JsonResponse({"message": "INVALID_KEY"}, status=400) 
                 
 class LogInView(View):
         def post(self, request):
