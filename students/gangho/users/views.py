@@ -1,6 +1,4 @@
-import json
-import bcrypt
-import jwt
+import json, bcrypt, jwt
 
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -9,7 +7,7 @@ from django.db import IntegrityError
 
 from users.models import User
 from users.validators import validate_email, validate_password
-from my_settings import SECRET_KEY, ALGORITHM
+from django.conf import settings
 
 class SignupView(View):
     def post(self, request):
