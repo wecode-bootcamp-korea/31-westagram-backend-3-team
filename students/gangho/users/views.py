@@ -62,8 +62,8 @@ class SigninView(View):
             validate_email(email)
             validate_password(password)
 
-            user_in_database = User.objects.get(email=email)
-            if not bcrypt.checkpw(password.encode('utf-8'), user_in_database.password.encode('utf-8')):
+            user = User.objects.get(email=email)
+            if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'message': 'INVALID_USER'}, status=401)
 
             return JsonResponse({
@@ -74,3 +74,5 @@ class SigninView(View):
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
         except ValidationError as e:
             return JsonResponse({'message': e.messages}, status=400)
+        except User.DoesNotExist:
+            return JsonResponse({'message': "Invalid user"}, status=404)
