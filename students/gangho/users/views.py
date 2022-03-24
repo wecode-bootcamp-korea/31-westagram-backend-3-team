@@ -1,4 +1,4 @@
-import json
+import json, bcrypt, jwt
 
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -7,16 +7,17 @@ from django.db import IntegrityError
 
 from users.models import User
 from users.validators import validate_email, validate_password
-
+from django.conf import settings
 
 class SignupView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            name         = data['name']
-            email        = data['email']
-            password     = data['password']
-            phone_number = data['phone_number']
+            name            = data['name']
+            email           = data['email']
+            password        = data['password']
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            phone_number    = data['phone_number']
 
             validate_email(email)
             validate_password(password)
@@ -29,7 +30,7 @@ class SignupView(View):
             User.objects.create(
                 name            = name,
                 email           = email,
-                password        = password,
+                password        = hashed_password,
                 phone_number    = phone_number
             )
 
@@ -61,12 +62,17 @@ class SigninView(View):
             validate_email(email)
             validate_password(password)
 
-            if not User.objects.filter(email=email, password=password).exists():
+            user = User.objects.get(email=email)
+            if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'message': 'INVALID_USER'}, status=401)
 
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return JsonResponse({
+                'message': "SUCCESS"
+            }, status=200)
 
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
         except ValidationError as e:
             return JsonResponse({'message': e.messages}, status=400)
+        except User.DoesNotExist:
+            return JsonResponse({'message': "Invalid user"}, status=404)
